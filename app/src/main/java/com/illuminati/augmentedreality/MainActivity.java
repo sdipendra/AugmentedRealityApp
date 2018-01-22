@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         _cameraBridgeViewBase = (CameraBridgeViewBase) findViewById(R.id.main_surface);
         _cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
         _cameraBridgeViewBase.setCvCameraViewListener(this);
+
+        inputImage = new Mat();
+        outputImage = new Mat();
     }
 
     @Override
@@ -114,9 +117,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Mat matGray = inputFrame.gray();
-        //salt(matGray.getNativeObjAddr(), 2000);
-        return matGray;
+        inputImage = inputFrame.rgba();
+        int retVal = transformImage(inputImage.getNativeObjAddr(), outputImage.getNativeObjAddr());
+        return outputImage;
+        //return inputImage;
     }
 
     //public native void salt(long matAddrGray, int nbrElem);
@@ -126,6 +130,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+    public native int transformImage(long addrInputImage, long addrOutputImage);
+
+    private Mat inputImage, outputImage;
 
     // Used to load the 'native-lib' library on application startup.
     static {
